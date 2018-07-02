@@ -1,11 +1,15 @@
 version: '2'
 services:
   elasticsearch:
-    image: docker.elastic.co/elasticsearch/elasticsearch:6.2.4
+    image: docker.elastic.co/elasticsearch/elasticsearch-oss:6.3.0
     container_name: elasticsearch
     environment:
-      - cluster.name=docker-cluster
       - bootstrap.memory_lock=true
+      - "node.name: dk_node"
+      - "transport.host: localhost"
+      - "transport.tcp.port: 9300"
+      - "http.port: 9200"
+      - "network.host: 0.0.0.0"
       - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
     ulimits:
       memlock:
@@ -15,5 +19,11 @@ services:
       - 9200:9200
       - 9300:9300
     volumes:
-      - ./elasticsearch/data
+      - /elasticsearch/data
 
+  kibana:
+    image: docker.elastic.co/kibana/kibana-oss:6.3.0
+    ports:
+      - 5601:5601
+    environment:
+      - "ELASTICSEARCH_URL: http://elasticsearch:9200"
